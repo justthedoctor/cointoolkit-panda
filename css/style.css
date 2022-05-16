@@ -1,0 +1,73 @@
+html, body {
+	height: 100%;
+}
+
+body {
+	background-color:#ffffff;
+}
+
+.displaynone {
+	display:none;
+}
+
+#wrap {
+	min-height: 100%;
+	height: auto;
+	/* Negative indent footer by its height */
+	margin: 0 auto -60px;
+	/* Pad bottom by footer height */
+	padding: 0 0 60px;
+}
+
+#footer {
+	height: 60px;
+	background-color: #f5f5f5;
+	padding-top: 20px;
+}
+
+.glyphicon-refresh-animate {
+    -animation: spin 1s infinite linear;
+    -webkit-animation: spin2 1s infinite linear;
+}
+
+@-webkit-keyframes spin2 {
+    from { -webkit-transform: rotate(0deg);}
+    to { -webkit-transform: rotate(360deg);}
+}
+
+@keyframes spin {
+    from { transform: scale(1) rotate(0deg);}
+    to { transform: scale(1) rotate(360deg);}
+}
+
+#verifyTransactionData .table>tbody>tr>td {
+	vertical-align: middle;
+}
+
+@media (min-width: 768px) {
+	.wideModal .modal-dialog {
+		width: 70%;
+	}
+}
+
+.sig_position {
+    text-align: center;
+}
+
+#multisigPubKeys .item {
+	margin-bottom: 5px;
+}
+
+.glyphicon-minus:before {
+    content: "\2212";
+    margin-left: -1px;
+}
+
+.handle {
+    padding-left: 15px;
+    font-size: 20px;
+}
+
+label[disabled] {
+    color: #ccc;
+}
