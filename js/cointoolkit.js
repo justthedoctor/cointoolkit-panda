@@ -1,4 +1,5 @@
-var sequence = 0xffffffff-1;var tickerCode;
+var sequence = 0xffffffff-1;
+var tickerCode;
 var customCoinTicker;
 var address;
 var coingeckoCoinName;
@@ -38,13 +39,11 @@ if(customCoinTicker == null){
 			customCoinTicker = tickerCode.toLowerCase();
 
 }
-
 if(customCoinTicker == null){
 console.log("coinbin.js customCoinTicker reset to pnd")
 			customCoinTicker = "pnd";
 tickerCode = "PND";
 }
-
 							var explorer_tx = "https://chainz.cryptoid.info/"+ customCoinTicker.toLowerCase() +"/tx.dws?";
 							var explorer_addr = "https://chainz.cryptoid.info/"+ customCoinTicker.toLowerCase() +"/address.dws?";
 							var explorer_block = "https://chainz.cryptoid.info/"+ customCoinTicker.toLowerCase() +"/block.dws?";
@@ -1507,7 +1506,7 @@ var host = $("#coinjs_broadcast option:selected").val();
 						if (coinjs.debug) {console.log(data)};
 						if ((data.unspent_outputs)){
 							$("#redeemFromAddress").removeClass('hidden').html(
-								'<span class="glyphicon glyphicon-info-sign"></span> Retrieved unspent inputs from address <a href="https://chainz.cryptoid.info/pnd/address.dws?'+
+								'<span class="glyphicon glyphicon-info-sign"></span> Retrieved unspent inputs from address <a href="https://chainz.cryptoid.info/'+ customCoinTicker +'/address.dws?'+
 								redeem.addr+'" target="_blank">'+redeem.addr+'</a>');
 							for(i = 0; i < data.unspent_outputs.length; ++i){
 								var o = data.unspent_outputs[i];
@@ -1558,7 +1557,7 @@ var host = $("#coinjs_broadcast option:selected").val();
 				$(thisbtn).html('Please wait, loading... <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>').attr('disabled',true);
 				$.ajax ({
 					type: "POST",
-					url: "https://chainz.cryptoid.info/pnd/api.dws?q=pushtx&key="+coinjs.apikey,
+					url: "https://chainz.cryptoid.info/"+ customCoinTicker +"/api.dws?q=pushtx&key="+coinjs.apikey,
 					data: $("#rawTransaction").val(), //{"tx_hex":$("#rawTransaction").val()},
 					dataType: "text", //"json",
 					error: function(data, status, error) {
@@ -1591,7 +1590,7 @@ var host = $("#coinjs_broadcast option:selected").val();
         var msgError = '<span class="glyphicon glyphicon-exclamation-sign"></span> Unexpected error, unable to retrieve unspent outputs! Is <a href="' + endpoint + '/">' + endpoint + '/</a> down?';
         $.ajax ({
           type: "GET",
-          url: "https://chainz.cryptoid.info/pnd/api.dws?q=unspent&key="+coinjs.apikey+"&active="+redeem.addr,
+          url: "https://chainz.cryptoid.info/blk/api.dws?q=unspent&key="+coinjs.apikey+"&active="+redeem.addr,
           dataType: "json",
           error: function(data) {
             $("#redeemFromStatus").removeClass('hidden').html(msgError);
@@ -1601,7 +1600,7 @@ var host = $("#coinjs_broadcast option:selected").val();
             if (coinjs.debug) {console.log(data)};
             if ((data.unspent_outputs)){
               $("#redeemFromAddress").removeClass('hidden').html(
-                '<span class="glyphicon glyphicon-info-sign"></span> Retrieved unspent inputs from address <a href="https://chainz.cryptoid.info/pnd/address.dws?'+
+                '<span class="glyphicon glyphicon-info-sign"></span> Retrieved unspent inputs from address <a href="https://chainz.cryptoid.info/'+ customCoinTicker +'/address.dws?'+
                 redeem.addr+'" target="_blank">'+redeem.addr+'</a>');
               for(i = 0; i < data.unspent_outputs.length; ++i){
                 var o = data.unspent_outputs[i];
@@ -1652,7 +1651,7 @@ var host = $("#coinjs_broadcast option:selected").val();
         $(thisbtn).html('Please wait, loading... <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>').attr('disabled',true);
         $.ajax ({
           type: "POST",
-          url: "https://chainz.cryptoid.info/pnd/api.dws?q=pushtx&key="+coinjs.apikey,
+          url: "https://chainz.cryptoid.info/" + customCoinTicker + "/api.dws?q=pushtx&key="+coinjs.apikey,
           data: $("#rawTransaction").val(), //{"tx_hex":$("#rawTransaction").val()},
           dataType: "text", //"json",
           error: function(data, status, error) {
@@ -2715,10 +2714,21 @@ var bcBasedExplorer = {
 				*/
         //jrm added from allcoinsSubmitButtonIDHere
         tx2.broadcast(function(data){
-          if($(data).find("result").text()=="1"){
-            $("#walletSendConfirmStatus").removeClass('hidden').addClass('alert-success').html('txid: <a href="https://coinb.in/tx/'+$(data).find("txid").text()+'" target="_blank">'+$(data).find("txid").text()+'</a>');
+          console.log(data);
+          if(data.startsWith('"')){
+            var txid = data.match(/^"([^"]+)"/)[1];
+            $("#walletSendConfirmStatus").removeClass('hidden').addClass('alert-success').html('txid: <a href="https://chainz.cryptoid.info/pnd/tx.dws?'+ txid +'" target="_blank">'+ txid +'</a>');
+          } else if(data.startsWith('{')) {
+            console.log("Failure Data: "+ data) // Data from fail
+            errmsg = JSON.parse(data.split('\n')[0])['error']['message'];
+            console.log(errmsg);
+            $("#walletSendConfirmStatus").removeClass('hidden').addClass('alert-danger').html('Error: '+errmsg);
+            $("#walletSendFailTransaction").removeClass('hidden');
+            $("#walletSendFailTransaction textarea").val(signed);
+            thisbtn.attr('disabled',false);
           } else {
-            $("#walletSendConfirmStatus").removeClass('hidden').addClass('alert-danger').html(unescape($(data).find("response").text()).replace(/\+/g,' '));
+            console.log(data);
+            $("#walletSendConfirmStatus").removeClass('hidden').addClass('alert-danger').html('Error: Unknown Error');
             $("#walletSendFailTransaction").removeClass('hidden');
             $("#walletSendFailTransaction textarea").val(signed);
             thisbtn.attr('disabled',false);
@@ -2729,7 +2739,7 @@ var bcBasedExplorer = {
 
         }, signed);
 			} else {
-				$("#walletSendConfirmStatus").removeClass("hidden").addClass('alert-danger').html("You have a confirmed balance of "+data.value+" PND unable to send "+total+" PND").fadeOut().fadeIn();
+				$("#walletSendConfirmStatus").removeClass("hidden").addClass('alert-danger').html("You have a confirmed balance of "+data.value+ " " + customCoinTicker.toUpperCase() +" unable to send "+total+ " " + customCoinTicker.toUpperCase() +"").fadeOut().fadeIn();
 				thisbtn.attr('disabled',false);
 			}
 
@@ -3345,6 +3355,11 @@ console.log(amount.val());
 	$("#coinjs_hdprv").val('0x'+(coinjs.hdkey.prv).toString(16));
 
 	$("#settingsBtn").click(function(){
+    if ($("#coinjs_coin").val()=="blackcoin"){
+      customCoinTicker = "blk";
+    tickerCode = "BLK";
+    console.log("works");
+    }
 
 		// log out of openwallet
 		$("#walletLogout").click();
@@ -3460,7 +3475,7 @@ console.log(amount.val());
 
 			walletAvailableUnspent = true;
 		} else {
-			$("#coinjs_utxo, #redeemFrom, #redeemFromBtn").attr('disabled',true);
+			$("#coinjs_utxo, #redeemFrom, #redeemFromBtn").attr('disabled',false);
 			$("#coinjs_utxo").append('<option value="disabled">Currently not available for ' + this.options[ this.selectedIndex ].text+'</option>').val("disabled");
 
 			$("#redeemFrom").val("Loading of address inputs is currently not available for " + this.options[ this.selectedIndex ].text);
