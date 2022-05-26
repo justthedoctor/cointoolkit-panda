@@ -44,12 +44,22 @@ console.log("coinbin.js customCoinTicker reset to pnd")
 			customCoinTicker = "pnd";
 tickerCode = "PND";
 }
+if ($("#coinjs_coin").val()=="pandacoin"){
 							var explorer_tx = "https://chainz.cryptoid.info/"+ customCoinTicker.toLowerCase() +"/tx.dws?";
 							var explorer_addr = "https://chainz.cryptoid.info/"+ customCoinTicker.toLowerCase() +"/address.dws?";
 							var explorer_block = "https://chainz.cryptoid.info/"+ customCoinTicker.toLowerCase() +"/block.dws?";
 							var explorer_api = "https://api.cryptodepot.org/chainz/balance/"+ customCoinTicker.toLowerCase() +"/";
 							coinjs.explorer_api = explorer_api
 console.log("coinbin.js explorer_api set to "+ explorer_api)
+}
+else if ($("#coinjs_coin").val()=="blackcoin"){
+  var explorer_tx = "https://chainz.cryptoid.info/blk/tx.dws?";
+  var explorer_addr = "https://chainz.cryptoid.info/blk/address.dws?";
+  var explorer_block = "https://chainz.cryptoid.info/blk/block.dws?";
+  var explorer_api = "https://api.cryptodepot.org/chainz/balance/"+ customCoinTicker.toLowerCase() +"/";
+  coinjs.explorer_api = explorer_api
+console.log("coinbin.js explorer_api set to "+ explorer_api)
+}
 
 function walletBalance(){
   var tx = coinjs.transaction();
@@ -2588,8 +2598,14 @@ var bcBasedExplorer = {
 
 					$("#walletAddress").html(keys.address);
 					//jrm was $("#walletHistory").attr('href','//btc.blockr.io/address/info/'+keys.address);
+          if ($("#coinjs_coin option:selected").val() == "pandacoin") {
+            var explorer_addr = "https://chainz.cryptoid.info/pnd/address.dws?";
+            console.log(explorer_addr);
           $("#walletHistory").attr('href',explorer_addr+keys.address);
-
+          } else if ($("#coinjs_coin option:selected").val() == "blackcoin") {
+            var explorer_addr = "https://chainz.cryptoid.info/blk/address.dws?";
+            $("#walletHistory").attr('href',explorer_addr+keys.address);
+          }
 					$("#walletQrCode").html("");
 					var qrcode = new QRCode("walletQrCode");
 					qrcode.makeCode(keys.address);
@@ -2677,6 +2693,7 @@ var bcBasedExplorer = {
 		thisbtn.attr('disabled',true);
 
 		tx.addUnspent($("#walletAddress").html(), function(data){
+      console.log('Dcimal Places: ' + coinjs.decimalPlaces);
 			var dvalue = data.value/("1e"+coinjs.decimalPlaces);
 			if(dvalue>=total){
 				var change = dvalue-total;
@@ -2717,7 +2734,13 @@ var bcBasedExplorer = {
           console.log(data);
           if(data.startsWith('"')){
             var txid = data.match(/^"([^"]+)"/)[1];
-            $("#walletSendConfirmStatus").removeClass('hidden').addClass('alert-success').html('txid: <a href="https://chainz.cryptoid.info/pnd/tx.dws?'+ txid +'" target="_blank">'+ txid +'</a>');
+              if ($("#coinjs_coin option:selected").val() == "pandacoin") {
+                console.log("This is pandacoins TXID message")
+                $("#walletSendConfirmStatus").removeClass('hidden').addClass('alert-success').html('txid: <a href="https://chainz.cryptoid.info/pnd/tx.dws?'+ txid +'" target="_blank">'+ txid +'</a>');
+              } else if ($("#coinjs_coin option:selected").val() == "blackcoin") {
+                console.log("This is blackcoin TXID message")
+                $("#walletSendConfirmStatus").removeClass('hidden').addClass('alert-success').html('txid: <a href="https://chainz.cryptoid.info/blk/tx.dws?'+ txid +'" target="_blank">'+ txid +'</a>');
+              }
           } else if(data.startsWith('{')) {
             console.log("Failure Data: "+ data) // Data from fail
             errmsg = JSON.parse(data.split('\n')[0])['error']['message'];
@@ -2739,7 +2762,7 @@ var bcBasedExplorer = {
 
         }, signed);
 			} else {
-				$("#walletSendConfirmStatus").removeClass("hidden").addClass('alert-danger').html("You have a confirmed balance of "+data.value+ " " + customCoinTicker.toUpperCase() +" unable to send "+total+ " " + customCoinTicker.toUpperCase() +"").fadeOut().fadeIn();
+				$("#walletSendConfirmStatus").removeClass("hidden").addClass('alert-danger').html("You have a confirmed balance of "+ dvalue+ " " + customCoinTicker.toUpperCase() +" unable to send "+total+ " " + customCoinTicker.toUpperCase() +"").fadeOut().fadeIn();
 				thisbtn.attr('disabled',false);
 			}
 
@@ -3560,6 +3583,7 @@ console.log(amount.val());
 		$("#coinjs_extraunitfieldvalue").val(o[10]);
 
 		$("#coinjs_decimalplaces").val(o[11]);
+    coinjs.decimalPlaces = o[11]
 
 		$("#coinjs_symbol").val(o[12]);
 

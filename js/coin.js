@@ -7,6 +7,10 @@
 $(document).ready(function() {
 		var host = $("#coinjs_coin option:selected").val();
 console.log(host);
+$("#coinSelector").click(function() {
+    host = $("#coinjs_coin option:selected").val();
+		console.log("It Worked: " + host);
+  });
 (function () {
 
 	var coinjs = window.coinjs = function () { };
@@ -1248,9 +1252,11 @@ console.log(host);
 			r.listUnspent = function(address, callback) {
 				console.log("List Unspent: " + host);
 				if(host == "pandacoin") {
+					console.log(host);
 				coinjs.ajax('https://api.cryptodepot.org/chainz/listunspent/pnd/'+address, callback, "GET");
 				}
 				else if(host == "blackcoin") {
+					console.log(host);
 				coinjs.ajax('https://api.cryptodepot.org/chainz/listunspent/blk/'+address, callback, "GET");
 				}
 			}
@@ -1328,7 +1334,12 @@ r.addUnspent = function(address, callback, script, segwit, sequence){
 				//jrm old x.unspent = $(xmlDoc).find("unspent");
 				x.unspent = unspent;   //jrm added from coinbin
 				//jrm2 was x.value = value;
+				if(host == "pandacoin") {
 			x.value = (value/100);
+			}
+			else if(host == "blackcoin") {
+			 x.value = value;
+		 }
 			x.total = total;
 				return callback(x);
 			});
@@ -1348,9 +1359,11 @@ r.addUnspent = function(address, callback, script, segwit, sequence){
 			var tx = txhex || this.serialize();
 			console.log("Broadcast: " + host);
 			if(host == "pandacoin") {
+				console.log(host);
 			coinjs.ajax("https://chainz.cryptoid.info/pnd/api.dws?q=pushtx", callback, "POST", tx);
 			}
 			else if(host == "blackcoin") {
+				console.log(host);
 				coinjs.ajax("https://chainz.cryptoid.info/blk/api.dws?q=pushtx", callback, "POST", tx);
 			}
 		}
