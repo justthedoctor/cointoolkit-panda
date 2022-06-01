@@ -1259,6 +1259,10 @@ $("#coinSelector").click(function() {
 					console.log(host);
 				coinjs.ajax('https://api.cryptodepot.org/chainz/listunspent/blk/'+address, callback, "GET");
 				}
+				else if(host == "peercoin") {
+					console.log(host);
+				coinjs.ajax('https://api.cryptodepot.org/chainz/listunspent/ppc/'+address, callback, "GET");
+				}
 			}
 
 		/* old add unspent to transaction
@@ -1340,6 +1344,9 @@ r.addUnspent = function(address, callback, script, segwit, sequence){
 			else if(host == "blackcoin") {
 			 x.value = value;
 		 }
+		 else if(host == "peercoin") {
+			x.value = value/94;
+		}
 			x.total = total;
 				return callback(x);
 			});
@@ -1365,6 +1372,10 @@ r.addUnspent = function(address, callback, script, segwit, sequence){
 			else if(host == "blackcoin") {
 				console.log(host);
 				coinjs.ajax("https://chainz.cryptoid.info/blk/api.dws?q=pushtx", callback, "POST", tx);
+			}
+			else if(host == "peercoin") {
+				console.log(host);
+				coinjs.ajax("https://api.cryptodepot.org/ppc/broadcast/" + tx, callback, "GET", tx);
 			}
 		}
 

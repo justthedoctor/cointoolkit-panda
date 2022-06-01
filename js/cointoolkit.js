@@ -1280,11 +1280,12 @@ var host = $("#coinjs_broadcast option:selected").val();
 		},
 		broadcast: function(endpoint) {
 			return function(thisbtn){
+        console.log("Peer Broadcast");
 				var orig_html = $(thisbtn).html();
 				$(thisbtn).html('Please wait, loading... <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>').attr('disabled',true);
 				$.ajax ({
 					type: "GET",
-					url: "" + endpoint + "/api/sendrawtransaction?hex="+$("#rawTransaction").val(),
+					url: "https://api.cryptodepot.org/ppc/broadcast/"+$("#rawTransaction").val(),
 					dataType: "text", //"json",
 					error: function(data, status, error) {
 						var obj = data.responseText; //$.parseJSON(data.responseText);
@@ -1378,8 +1379,8 @@ var host = $("#coinjs_broadcast option:selected").val();
 				var orig_html = $(thisbtn).html();
 				$(thisbtn).html('Please wait, loading... <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>').attr('disabled',true);
 				$.ajax ({
-					type: "POST",
-					url: "https://chainz.cryptoid.info/ppc/api.dws?q=pushtx&key="+coinjs.apikey,
+					type: "GET",
+					url: "https://api.cryptodepot.org/ppc/broadcast/" + $("#rawTransaction").val(),
 					data: $("#rawTransaction").val(), //{"tx_hex":$("#rawTransaction").val()},
 					dataType: "text", //"json",
 					error: function(data, status, error) {
@@ -2605,6 +2606,9 @@ var bcBasedExplorer = {
           } else if ($("#coinjs_coin option:selected").val() == "blackcoin") {
             var explorer_addr = "https://chainz.cryptoid.info/blk/address.dws?";
             $("#walletHistory").attr('href',explorer_addr+keys.address);
+          } else if ($("#coinjs_coin option:selected").val() == "peercoin") {
+            var explorer_addr = "https://chainz.cryptoid.info/ppc/address.dws?";
+            $("#walletHistory").attr('href',explorer_addr+keys.address);
           }
 					$("#walletQrCode").html("");
 					var qrcode = new QRCode("walletQrCode");
@@ -2641,7 +2645,7 @@ var bcBasedExplorer = {
 		$("#openWallet").addClass("hidden").show();
 
 		$("#walletAddress").html("");
-		$("#walletHistory").attr('href','//btc.blockr.io/address/info/');
+		$("#walletHistory").attr('href','https://chainz.cryptoid.info/ppc/address.dws?');
 
 		$("#walletQrCode").html("");
 		var qrcode = new QRCode("walletQrCode");
@@ -2741,7 +2745,17 @@ var bcBasedExplorer = {
                 console.log("This is blackcoin TXID message")
                 $("#walletSendConfirmStatus").removeClass('hidden').addClass('alert-success').html('txid: <a href="https://chainz.cryptoid.info/blk/tx.dws?'+ txid +'" target="_blank">'+ txid +'</a>');
               }
-          } else if(data.startsWith('{')) {
+          } else if(data.startsWith('{"result"')) {
+            var txid = data.result;
+              if ($("#coinjs_coin option:selected").val() == "pandacoin") {
+                console.log("This is pandacoins TXID message")
+                $("#walletSendConfirmStatus").removeClass('hidden').addClass('alert-success').html('txid: <a href="https://chainz.cryptoid.info/pnd/tx.dws?'+ txid +'" target="_blank">'+ txid +'</a>');
+              } else if ($("#coinjs_coin option:selected").val() == "blackcoin") {
+                console.log("This is blackcoin TXID message")
+                $("#walletSendConfirmStatus").removeClass('hidden').addClass('alert-success').html('txid: <a href="https://chainz.cryptoid.info/blk/tx.dws?'+ txid +'" target="_blank">'+ txid +'</a>');
+              }
+          }
+          else if(data.startsWith('{')) {
             console.log("Failure Data: "+ data) // Data from fail
             errmsg = JSON.parse(data.split('\n')[0])['error']['message'];
             console.log(errmsg);
@@ -3381,7 +3395,12 @@ console.log(amount.val());
     if ($("#coinjs_coin").val()=="blackcoin"){
       customCoinTicker = "blk";
     tickerCode = "BLK";
-    console.log("works");
+    console.log("works" + tickerCode);
+    }
+    else if ($("#coinjs_coin").val()=="peercoin"){
+      customCoinTicker = "ppc";
+    tickerCode = "PPC";
+    console.log("works" + tickerCode);
     }
 
 		// log out of openwallet
